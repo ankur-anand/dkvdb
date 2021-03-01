@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ankur-anand/dis-db/api/proto/v1/kv"
 	"github.com/ankur-anand/dis-db/internal/raftstorage/snapshot"
+	"github.com/ankur-anand/dis-db/proto/v1/raftkv"
 	badger "github.com/dgraph-io/badger/v3"
 )
 
@@ -18,9 +18,9 @@ type Database struct {
 
 // SnapshotItems provides a snapshot isolation of a transaction
 // from the underyling database
-func (d Database) SnapshotItems() <-chan *kv.SnapshotItem {
+func (d Database) SnapshotItems() <-chan *raftkv.SnapshotItem {
 	// create a new no blocking channel
-	ch := make(chan *kv.SnapshotItem, 1024)
+	ch := make(chan *raftkv.SnapshotItem, 1024)
 	// generate items from snapshot to channel
 	go d.db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -33,7 +33,7 @@ func (d Database) SnapshotItems() <-chan *kv.SnapshotItem {
 			item := it.Item()
 			k := item.KeyCopy(nil)
 			v, err := item.ValueCopy(nil)
-			ssi := &kv.SnapshotItem{Key: k, Value: v}
+			ssi := &raftkv.SnapshotItem{Key: k, Value: v}
 			copy(ssi.Key, k)
 			keyCount = keyCount + 1
 			ch <- ssi
@@ -43,7 +43,7 @@ func (d Database) SnapshotItems() <-chan *kv.SnapshotItem {
 		}
 
 		// just use nil to mark the end
-		ssi := &kv.SnapshotItem{
+		ssi := &raftkv.SnapshotItem{
 			Key:   nil,
 			Value: nil,
 		}

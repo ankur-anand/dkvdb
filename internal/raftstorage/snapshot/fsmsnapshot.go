@@ -4,19 +4,21 @@ import (
 	"encoding/binary"
 	"log"
 
-	"github.com/ankur-anand/dis-db/api/proto/v1/kv"
+	"github.com/ankur-anand/dis-db/proto/v1/raftkv"
 	"github.com/hashicorp/raft"
 	"google.golang.org/protobuf/proto"
 )
 
 type snapshotter interface {
-	SnapshotItems() <-chan *kv.SnapshotItem
+	SnapshotItems() <-chan *raftkv.SnapshotItem
 }
 
+// FSMSnapshot implements the raft snapshot persistance layer
 type FSMSnapshot struct {
 	snap snapshotter
 }
 
+// NewFSMSnapshot returns a new initialized FSMSnapshot Implementation
 func NewFSMSnapshot(snap snapshotter) *FSMSnapshot {
 	return &FSMSnapshot{snap: snap}
 }
