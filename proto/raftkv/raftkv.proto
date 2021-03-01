@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option go_package = "proto/v1/raftkv";
+
+package api.proto.kv;
+
+message LogEntryData {
+    enum Operation {
+        UNKOWN = 0;
+        GET = 1;
+        SET = 2;
+        DELETE = 3;
+    } 
+    Operation op = 1;
+    string key = 2;
+    bytes value = 3;
+}
+
+message SnapshotItem {
+    bytes key = 1;
+    bytes value = 2;
+}
