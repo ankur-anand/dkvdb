@@ -11,6 +11,7 @@ import (
 )
 
 func TestKVStorage(t *testing.T) {
+	t.Parallel()
 	dataDir := t.TempDir()
 	database, err := kv.NewDatabase(context.Background(), dataDir)
 	if err != nil {
@@ -71,4 +72,48 @@ func randSeq(n int) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func TestSnaphot(t *testing.T) {
+	t.Parallel()
+	dataDir := t.TempDir()
+	database, err := kv.NewDatabase(context.Background(), dataDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer database.Shutdown()
+	rand.Seed(time.Now().UnixNano())
+	keyValuePair := make(map[string][]byte)
+	count := 10000
+	// add 10 key value pair
+	for i := 0; i < count; i++ {
+		keyValuePair[randSeq(10)] = []byte(randSeq(30 + i))
+	}
+
+	// set some value
+	for k, v := range keyValuePair {
+		err := database.Set(k, v)
+		if err != nil {
+			t.Errorf("err set db %v", err)
+		}
+	}
+
+	ch := database.SnapshotItems()
+
+	keyCount := 0
+
+	// read kv item from channel
+	for {
+
+		dataItem := <-ch
+		if dataItem.Key == nil {
+			break
+		}
+
+		keyCount = keyCount + 1
+	}
+	if keyCount != count {
+		t.Errorf("expected keys in snapshot %d got %d", count, keyCount)
+	}
 }

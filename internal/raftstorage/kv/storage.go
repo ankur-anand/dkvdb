@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/ankur-anand/dis-db/api/proto/v1/kv"
 	badger "github.com/dgraph-io/badger/v3"
 )
 
@@ -138,4 +139,46 @@ func (d Database) runGC(ctx context.Context) {
 			return
 		}
 	}
+}
+
+// SnapshotItems provides a snapshot isolation of a transaction
+// from the underyling database
+func (d Database) SnapshotItems() <-chan *kv.SnapshotItem {
+	// create a new no blocking channel
+	ch := make(chan *kv.SnapshotItem, 1024)
+	// generate items from snapshot to channel
+	go d.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchSize = 10
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		keyCount := 0
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+			k := item.KeyCopy(nil)
+			v, err := item.ValueCopy(nil)
+			ssi := &kv.SnapshotItem{Key: k, Value: v}
+			copy(ssi.Key, k)
+			keyCount = keyCount + 1
+			ch <- ssi
+			if err != nil {
+				return err
+			}
+		}
+
+		// just use nil to mark the end
+		ssi := &kv.SnapshotItem{
+			Key:   nil,
+			Value: nil,
+		}
+		ch <- ssi
+
+		log.Printf("total number of keys in this snapshot = %d", keyCount)
+
+		return nil
+	})
+
+	// return channel to persist
+	return ch
 }
