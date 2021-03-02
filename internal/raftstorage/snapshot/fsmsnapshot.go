@@ -46,15 +46,18 @@ func (f *FSMSnapshot) Persist(sink raft.SnapshotSink) error {
 		keyCount = keyCount + 1
 		// send high order bytes first.
 		if _, err := sink.Write(lenBuf); err != nil {
+			sink.Cancel()
 			return err
 		}
 		// encode message
 		// if large happens we can use buffer pool.
 		buff, err := proto.Marshal(dataItem)
 		if err != nil {
+			sink.Cancel()
 			return err
 		}
 		if _, err := sink.Write(buff); err != nil {
+			sink.Cancel()
 			return err
 		}
 
