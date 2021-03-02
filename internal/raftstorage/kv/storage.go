@@ -58,15 +58,15 @@ func (d Database) Shutdown() {
 	d.cancelFunc()
 }
 
-// Get attempts to get a value for a given key.
+// GetB attempts to get a value for a given bytes key.
 // If the key does not exist it returns a nil value.
-func (d Database) Get(key string) ([]byte, error) {
+func (d Database) GetB(key []byte) ([]byte, error) {
 
 	// View is a closure.
 	var value []byte
 	err := d.db.View(func(txn *badger.Txn) error {
 
-		item, err := txn.Get([]byte(key))
+		item, err := txn.Get(key)
 
 		if err != nil {
 			return err //
@@ -89,28 +89,26 @@ func (d Database) Get(key string) ([]byte, error) {
 	return value, err
 }
 
-// Set attempts to store a value for a given key
-func (d Database) Set(key string, val []byte) error {
+// SetB attempts to store a value for a given bytes key
+func (d Database) SetB(key, val []byte) error {
 	txn := d.db.NewTransaction(true)
 	err := txn.Set([]byte(key), val)
 	if err == badger.ErrTxnTooBig {
 		_ = txn.Commit()
 		txn = d.db.NewTransaction(true)
-		err = txn.Set([]byte(key), val)
+		err = txn.Set(key, val)
 	}
 	return txn.Commit()
 }
 
-// Del deletes the given key from the underlying database.
-func (d Database) Del(key string) error {
-	var keyByte = []byte(key)
-
+// DelB deletes the given bytes key from the underlying database.
+func (d Database) DelB(key []byte) error {
 	txn := d.db.NewTransaction(true)
 	defer func() {
 		_ = txn.Commit()
 	}()
 
-	err := txn.Delete(keyByte)
+	err := txn.Delete(key)
 	if err != nil {
 		return err
 	}

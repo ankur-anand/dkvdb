@@ -28,7 +28,7 @@ func TestKVStorage(t *testing.T) {
 
 	// set some value
 	for k, v := range keyValuePair {
-		err := database.Set(k, v)
+		err := database.SetB([]byte(k), v)
 		if err != nil {
 			t.Errorf("err set db %v", err)
 		}
@@ -36,7 +36,7 @@ func TestKVStorage(t *testing.T) {
 
 	// get some value
 	for k, v := range keyValuePair {
-		val, err := database.Get(k)
+		val, err := database.GetB([]byte(k))
 		if err != nil {
 			t.Errorf("err get db %v", err)
 		}
@@ -47,14 +47,14 @@ func TestKVStorage(t *testing.T) {
 
 	// del some value
 	for k := range keyValuePair {
-		err := database.Del(k)
+		err := database.DelB([]byte(k))
 		if err != nil {
 			t.Errorf("err sel db %v", err)
 		}
 	}
 
 	for k := range keyValuePair {
-		val, err := database.Get(k)
+		val, err := database.GetB([]byte(k))
 		if err != nil {
 			t.Errorf("err get db %v", err)
 		}
@@ -93,7 +93,7 @@ func TestSnaphot(t *testing.T) {
 
 	// set some value
 	for k, v := range keyValuePair {
-		err := database.Set(k, v)
+		err := database.SetB([]byte(k), v)
 		if err != nil {
 			t.Errorf("err set db %v", err)
 		}
