@@ -31,6 +31,7 @@ type Database struct {
 // NewDatabase returns a new initialized BadgerDB database
 // If the database cannot be initialized, an error will be returned.
 func NewDatabase(ctx context.Context, dataDir string) (Database, error) {
+	log.Println("opening badger db")
 	if err := os.MkdirAll(dataDir, 0774); err != nil {
 		return Database{}, err
 	}
@@ -54,8 +55,12 @@ func NewDatabase(ctx context.Context, dataDir string) (Database, error) {
 }
 
 // Shutdown tries to close if any running background goroutines.
-func (d Database) Shutdown() {
+// and persist all of the pending writes to disk
+func (d Database) Shutdown() error {
+	log.Println("closing badger db to persist all write")
 	d.cancelFunc()
+	return d.db.Close()
+
 }
 
 // GetB attempts to get a value for a given bytes key.

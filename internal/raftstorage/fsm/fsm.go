@@ -81,6 +81,7 @@ func (r RaftFSM) Snapshot() (raft.FSMSnapshot, error) {
 // concurrently with any other command. The FSM must discard all previous
 // state.
 func (r RaftFSM) Restore(irc io.ReadCloser) error {
+	log.Println("restoring raft fsm")
 	defer irc.Close()
 
 	// read file
