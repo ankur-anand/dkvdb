@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "proto/v1/config";
+
+package api.proto.config;
+
+// RaftStorageConfig Stores all of the configuration variable
+// needed for raft storage to fully function.
+message RaftStorageConfig {
+	// NodeID is the unique ID for this server across all time.
+	string NodeID = 1;
+	// ApplyTimeOutMS is the timeout duration for quorum inside raft cluster
+	int32 ApplyTimeOutMS = 2;
+	// DataPath is the Path where the given KV database should be persisted.
+	string DataPath = 3;
+	// RaftVolumeDir is the path for raft cluster to store and load
+	string RaftVolumeDir = 4;
+    // SnapRetainNo controls how many snapshots are retained. Must be 1 atleast
+	int32 SnapRetainNo = 5;
+	// LogCacheSize controls how much Log should be stored in cache for Better
+	// IO.
+	int32 LogCacheSize = 6;
+	// RaftTCPBindAddr is the address which the given raft server
+	// bind and advertise to its peer.
+	string RaftTCPBindAddr = 7;
+	// SnapshotIntervalSec controls how often raft should perform a snapshot.
+	int32 SnapshotIntervalSec = 8;
+}
