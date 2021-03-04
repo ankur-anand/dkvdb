@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"log"
 
-	"github.com/ankur-anand/dis-db/proto/v1/raftkv"
+	"github.com/ankur-anand/dkvdb/proto/v1/raftkv"
 	"github.com/hashicorp/raft"
 	"google.golang.org/protobuf/proto"
 )

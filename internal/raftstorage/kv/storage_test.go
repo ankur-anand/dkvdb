@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ankur-anand/dis-db/internal/raftstorage/kv"
+	"github.com/ankur-anand/dkvdb/internal/raftstorage/kv"
 )
 
 func TestKVStorage(t *testing.T) {

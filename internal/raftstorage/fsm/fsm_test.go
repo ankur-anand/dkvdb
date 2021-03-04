@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ankur-anand/dis-db/internal/raftstorage/api"
-	"github.com/ankur-anand/dis-db/internal/raftstorage/fsm"
-	"github.com/ankur-anand/dis-db/proto/v1/raftkv"
+	"github.com/ankur-anand/dkvdb/internal/raftstorage/api"
+	"github.com/ankur-anand/dkvdb/internal/raftstorage/fsm"
+	"github.com/ankur-anand/dkvdb/proto/v1/raftkv"
 	"github.com/hashicorp/raft"
 	"google.golang.org/protobuf/proto"
 )

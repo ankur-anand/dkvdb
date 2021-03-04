@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ankur-anand/dis-db/internal/raftstorage/snapshot"
-	"github.com/ankur-anand/dis-db/proto/v1/raftkv"
+	"github.com/ankur-anand/dkvdb/internal/raftstorage/snapshot"
+	"github.com/ankur-anand/dkvdb/proto/v1/raftkv"
 	badger "github.com/dgraph-io/badger/v3"
 )
 
