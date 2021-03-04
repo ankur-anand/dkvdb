@@ -9,16 +9,16 @@ import (
 // RedisKV wraps the provided distributed kv storage
 // over redis protocol.
 type RedisKV struct {
-	mux *redcon.ServeMux
+	MUX *redcon.ServeMux
 	ns  *NodeStorage
 }
 
 func (rr *RedisKV) sethandler() {
-	rr.mux.HandleFunc("ping", rr.Ping)
-	rr.mux.HandleFunc("quit", rr.Quit)
-	rr.mux.HandleFunc("set", rr.Set)
-	rr.mux.HandleFunc("get", rr.Get)
-	rr.mux.HandleFunc("del", rr.Delete)
+	rr.MUX.HandleFunc("ping", rr.Ping)
+	rr.MUX.HandleFunc("quit", rr.Quit)
+	rr.MUX.HandleFunc("set", rr.Set)
+	rr.MUX.HandleFunc("get", rr.Get)
+	rr.MUX.HandleFunc("del", rr.Delete)
 }
 
 // NewRedisKVStorage returns an initialized Redis Handler
@@ -27,7 +27,9 @@ func NewRedisKVStorage(ns *NodeStorage) (*RedisKV, error) {
 	if ns == nil {
 		return nil, fmt.Errorf("provided nodestorage is nil")
 	}
-	return &RedisKV{mux: redcon.NewServeMux(), ns: ns}, nil
+	rkv := &RedisKV{MUX: redcon.NewServeMux(), ns: ns}
+	rkv.sethandler()
+	return rkv, nil
 }
 
 // Ping responds to ping redis protocol
