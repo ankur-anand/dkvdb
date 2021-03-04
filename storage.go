@@ -310,3 +310,16 @@ func (ns *NodeStorage) Shutdown() {
 		log.Printf("db shutdown failed %v", err)
 	}
 }
+
+// AddNewNode handles joining cluster request
+func (ns *NodeStorage) AddNewNode(nodeID, serverAddr string) error {
+
+	if nodeID == "" || serverAddr == "" {
+		return fmt.Errorf("invalid node id or server address")
+	}
+	addPeerFuture := ns.raft.AddVoter(raft.ServerID(nodeID), raft.ServerAddress(serverAddr), 0, 0)
+	if err := addPeerFuture.Error(); err != nil {
+		return err
+	}
+	return nil
+}

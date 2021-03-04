@@ -19,6 +19,7 @@ func (rr *RedisKV) sethandler() {
 	rr.MUX.HandleFunc("set", rr.Set)
 	rr.MUX.HandleFunc("get", rr.Get)
 	rr.MUX.HandleFunc("del", rr.Delete)
+	rr.MUX.HandleFunc("join", rr.JoinCluster)
 }
 
 // NewRedisKVStorage returns an initialized Redis Handler
@@ -106,4 +107,22 @@ func (rr *RedisKV) Delete(conn redcon.Conn, cmd redcon.Command) {
 	} else {
 		conn.WriteInt(1)
 	}
+}
+
+// JoinCluster add's the given cluster to the leader
+func (rr *RedisKV) JoinCluster(conn redcon.Conn, cmd redcon.Command) {
+	if len(cmd.Args) != 3 {
+		conn.WriteError("ERR wrong number of arguments for '" + string(cmd.Args[0]) + "' command")
+		return
+	}
+
+	err := rr.ns.AddNewNode(string(cmd.Args[1]), string(cmd.Args[2]))
+
+	if err != nil {
+		conn.WriteError(err.Error())
+		return
+
+	}
+
+	conn.WriteString("ok")
 }
