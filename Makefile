@@ -1,15 +1,21 @@
 default:
 	@echo "Specify command to run"
 
-# Run all tests.
-# set COVERAGE_DIR If not set
-COVERAGE_DIR ?= .coverage
-.PHONY: test
+# Run Quick unit tests.
 test:
-	@echo "[go test] running unit tests and collecting coverage metrics"
+	@echo "[go test] running unit tests"
 	@-rm -r $(COVERAGE_DIR)
 	@mkdir $(COVERAGE_DIR)
-	go test -v -race -covermode atomic -coverprofile $(COVERAGE_DIR)/combined.txt ./...
+	@go test -v ./...
+
+# set COVERAGE_DIR If not set
+COVERAGE_DIR ?= .coverage
+.PHONY: testr
+testr:
+	@echo "[go test] running unit tests with race flag and collecting coverage metrics"
+	@-rm -r $(COVERAGE_DIR)
+	@mkdir $(COVERAGE_DIR)
+	@go test -v -race -covermode atomic -coverprofile $(COVERAGE_DIR)/combined.txt ./...
 
 # get the html coverage
 coverage:
@@ -37,16 +43,12 @@ lint-check-deps:
 
 # go mod tidy
 modtidy:
-	go mod  tidy
+	@go mod  tidy
 
 # Generate protobuff from compiler. 
 protoc:
 	# `-I.` resolve all proto imports path relative to the current directory.
 	# compiled using protov2 API
-	protoc proto/raftkv/*.proto -I. --go_out=:.
-	protoc proto/config/*.proto -I. --go_out=:.
+	@protoc proto/raftkv/*.proto -I. --go_out=:.
+	@protoc proto/config/*.proto -I. --go_out=:.
 
-# Personal dev setup run.
-prcli:
-	@echo "running redis cli in docker"
-	@docker run -it --network host redis redis-cli -p 6380
